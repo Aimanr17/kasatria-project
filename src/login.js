@@ -1,6 +1,5 @@
 // Get the environment variables using Vite's import.meta.env
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-console.log('Environment loaded, client ID:', GOOGLE_CLIENT_ID);
 
 // Function to decode JWT token
 function decodeJwtResponse(token) {
@@ -19,45 +18,50 @@ function initializeGoogleSignIn() {
         return;
     }
 
-    console.log('Initializing Google Sign-In...');
     try {
         google.accounts.id.initialize({
             client_id: GOOGLE_CLIENT_ID,
-            callback: handleCredentialResponse
+            callback: handleCredentialResponse,
+            auto_select: false,
+            cancel_on_tap_outside: true
         });
-        google.accounts.id.renderButton(
-            document.getElementById("buttonDiv"),
-            { 
-                theme: "filled_blue",
-                size: "large",
-                text: "continue_with",
-                shape: "rectangular",
-                logo_alignment: "left",
-                width: 300
-            }
-        );
-        google.accounts.id.prompt();
-        console.log('Google Sign-In initialized successfully');
+
+        const buttonDiv = document.getElementById("buttonDiv");
+        if (buttonDiv) {
+            google.accounts.id.renderButton(
+                buttonDiv,
+                { 
+                    type: "standard",
+                    theme: "filled_blue",
+                    size: "large",
+                    text: "continue_with",
+                    shape: "rectangular",
+                    logo_alignment: "left",
+                    width: 250
+                }
+            );
+        }
     } catch (error) {
         console.error('Error initializing Google Sign-In:', error);
     }
 }
 
-// Make handleCredentialResponse global
-window.handleCredentialResponse = function(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
-    
-    const responsePayload = decodeJwtResponse(response.credential);
-    console.log("Decoded response:", responsePayload);
-
-    // Store user info in localStorage
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('userEmail', responsePayload.email);
-    localStorage.setItem('userName', responsePayload.name);
-    localStorage.setItem('userPicture', responsePayload.picture);
-    
-    console.log('Login successful, redirecting...');
-    window.location.href = '../index.html';
+// Handle Google Sign-In response
+function handleCredentialResponse(response) {
+    try {
+        const responsePayload = decodeJwtResponse(response.credential);
+        
+        // Store user info in localStorage
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userEmail', responsePayload.email);
+        localStorage.setItem('userName', responsePayload.name);
+        localStorage.setItem('userPicture', responsePayload.picture);
+        
+        // Redirect to main page
+        window.location.href = '../index.html';
+    } catch (error) {
+        console.error('Error handling Google Sign-In response:', error);
+    }
 }
 
 // Initialize when DOM is loaded
@@ -69,38 +73,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize Google Sign-In
-    if (window.google) {
+    if (typeof google !== 'undefined' && google.accounts) {
         initializeGoogleSignIn();
     } else {
         // If Google API isn't loaded yet, wait for it
-        window.onload = initializeGoogleSignIn;
+        window.onload = function() {
+            if (typeof google !== 'undefined' && google.accounts) {
+                initializeGoogleSignIn();
+            }
+        };
     }
 
+    // Handle regular login form
     const loginForm = document.getElementById('loginForm');
-    const errorMessage = document.getElementById('errorMessage');
-
-    // Hardcoded credentials (in real app, this should be server-side)
-    const validCredentials = {
-        username: 'admin',
-        password: '123'
-    };
-
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        if (username === validCredentials.username && password === validCredentials.password) {
-            // Login successful
+        // Simple validation (replace with your actual authentication logic)
+        if (username === 'admin' && password === '123') {
             localStorage.setItem('isLoggedIn', 'true');
             window.location.href = '../index.html';
         } else {
-            // Show error message
-            errorMessage.style.display = 'block';
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-            }, 3000);
+            alert('Invalid username or password');
         }
     });
 });

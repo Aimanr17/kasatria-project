@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>three.js css3d - periodic table</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "../build/three.module.js",
+                "three/addons/": "./jsm/"
+            }
+        }
+    </script>
+  <script type="module" crossorigin src="/kasatria-project/assets/index-CQzvjx7J.js"></script>
+  <link rel="stylesheet" crossorigin href="/kasatria-project/assets/index-N_RKB7pB.css">
+</head>
+<body>
+    <div id="info">Google Sheet Data Visualization<br/>Click to view</div>
+    <div id="container"></div>
+    <div id="menu">
+        <button id="table">Table</button>
+        <button id="sphere">Sphere</button>
+        <button id="helix">Helix</button>
+        <button id="grid">Grid</button>
+        <button id="logout" style="float: right; background-color: #e74c3c;">Logout</button>
+    </div>
+
+
+
+    <script>
+        // Check if user is logged in
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'src/login.html';
+        }
+
+        // Add logout functionality
+        document.getElementById('logout').addEventListener('click', function() {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'src/login.html';
+        });
+    </script>
+
+</body>
+</html>

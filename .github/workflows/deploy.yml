@@ -5,9 +5,16 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: github-pages
     
     steps:
       - name: Checkout
@@ -20,6 +27,8 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
 
       - name: Build
         run: npm run build

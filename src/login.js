@@ -1,5 +1,7 @@
 // Get the environment variables using Vite's import.meta.env
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+console.log('Environment loaded:', import.meta.env);
+console.log('Google Client ID available:', !!GOOGLE_CLIENT_ID);
 
 // Function to decode JWT token
 function decodeJwtResponse(token) {

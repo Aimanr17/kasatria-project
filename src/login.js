@@ -1,7 +1,5 @@
 // Get the environment variables using Vite's import.meta.env
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-console.log('Environment loaded:', import.meta.env);
-console.log('Google Client ID available:', !!GOOGLE_CLIENT_ID);
+const GOOGLE_CLIENT_ID = import.meta.env?.VITE_GOOGLE_CLIENT_ID;
 
 // Function to decode JWT token
 function decodeJwtResponse(token) {
@@ -16,7 +14,11 @@ function decodeJwtResponse(token) {
 // Initialize Google Sign-In
 function initializeGoogleSignIn() {
     if (!GOOGLE_CLIENT_ID) {
-        console.error('Google Client ID not found in environment variables');
+        console.error('Google Client ID not found in environment variables. Please make sure VITE_GOOGLE_CLIENT_ID is set.');
+        const buttonDiv = document.getElementById("buttonDiv");
+        if (buttonDiv) {
+            buttonDiv.innerHTML = '<p style="color: red;">Error: Google Sign-In is not configured properly. Please contact the administrator.</p>';
+        }
         return;
     }
 
@@ -42,9 +44,15 @@ function initializeGoogleSignIn() {
                     width: 250
                 }
             );
+        } else {
+            console.error('Button container not found');
         }
     } catch (error) {
         console.error('Error initializing Google Sign-In:', error);
+        const buttonDiv = document.getElementById("buttonDiv");
+        if (buttonDiv) {
+            buttonDiv.innerHTML = '<p style="color: red;">Error: Failed to initialize Google Sign-In. Please try again later.</p>';
+        }
     }
 }
 
@@ -63,6 +71,7 @@ function handleCredentialResponse(response) {
         window.location.href = '../index.html';
     } catch (error) {
         console.error('Error handling Google Sign-In response:', error);
+        alert('Failed to sign in with Google. Please try again.');
     }
 }
 
@@ -82,6 +91,12 @@ document.addEventListener('DOMContentLoaded', function() {
         window.onload = function() {
             if (typeof google !== 'undefined' && google.accounts) {
                 initializeGoogleSignIn();
+            } else {
+                console.error('Google API failed to load');
+                const buttonDiv = document.getElementById("buttonDiv");
+                if (buttonDiv) {
+                    buttonDiv.innerHTML = '<p style="color: red;">Error: Google Sign-In is not available. Please try again later.</p>';
+                }
             }
         };
     }
